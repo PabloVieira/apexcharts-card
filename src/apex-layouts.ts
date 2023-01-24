@@ -30,6 +30,16 @@ export function getLayoutConfig(
         (config.locale && locales[config.locale] && config.locale) ||
         (hass?.language && locales[hass.language] && hass.language) ||
         'en',
+      events: {
+        beforeZoom: function() {
+          // Save data to sessionStorage
+          sessionStorage.setItem("zoomed", "yes");
+        },
+        beforeResetZoom: function() {
+          // Save data to sessionStorage
+          sessionStorage.setItem("zoomed", "no");
+        }
+      },
       type: config.chart_type || DEFAULT_SERIE_TYPE,
       stacked: config?.stacked,
       foreColor: 'var(--primary-text-color)',

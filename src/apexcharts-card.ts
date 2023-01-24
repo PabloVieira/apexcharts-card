@@ -269,7 +269,6 @@ class ChartsCard extends LitElement {
         if (!this._dataLoaded) {
           this._firstDataLoad();
         } else {
-          this._updating = true;
           // give time to HA's recorder component to write the data in the history
           setTimeout(() => {
             this._updateData();
@@ -752,6 +751,9 @@ class ChartsCard extends LitElement {
   private async _initialLoad() {
     await this.updateComplete;
 
+    // Remove all saved data from sessionStorage
+    sessionStorage.clear();
+
     if (!this._apexChart && this.shadowRoot && this._config && this.shadowRoot.querySelector('#graph')) {
       this._loaded = true;
       const graph = this.shadowRoot.querySelector('#graph');
@@ -776,7 +778,13 @@ class ChartsCard extends LitElement {
   }
 
   private async _updateData() {
-    if (!this._config || !this._apexChart || !this._graphs) return;
+    const zoomed = sessionStorage.getItem("zoomed") === "yes";
+    if (!this._config || !this._apexChart || !this._graphs || zoomed) {
+      this._updating = false;
+      return;
+    }
+
+    this._updating = true;
 
     const { start, end } = this._getSpanDates();
     const now = new Date();
